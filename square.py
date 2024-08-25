@@ -18,3 +18,6 @@ class Square(Sprite):
     '''Draws square on screen'''
     pygame.draw.rect(self.screen, self.color, self.rect)
     pygame.draw.rect(self.screen, self.settings.board_frame_color, self.border, width=1)
+    
+  def get_place(self):
+    '''Returns the position of a square on the board'''

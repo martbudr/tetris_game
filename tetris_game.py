@@ -21,6 +21,8 @@ class Tetris:
   
   def run_game(self):
     '''Game loop'''
+    time_elapsed_since_last_movedown = 0
+    FPS = 60
     while True:
       self._check_events()
       
@@ -28,13 +30,14 @@ class Tetris:
         self.tetromino = Tetromino(self)
         self.tile_falling = True
       
-      self.tetromino.move_down()
+      if time_elapsed_since_last_movedown > 3000 and not self.tetromino.collided_down:
+        self.tetromino.move_down()
+        time_elapsed_since_last_movedown = 0
       
       self._upgrade_screen()
       
-      sleep(0.8)
-      
-      self.clock.tick(60)
+      self.clock.tick(FPS)
+      time_elapsed_since_last_movedown += FPS
   
   def _check_events(self):
     '''Checks for user input'''
@@ -46,8 +49,14 @@ class Tetris:
         
   def _check_keydown_events(self, event):
     '''Checks keydown events and triggers appropriate responses'''
-    if event.key == pygame.K_q:
+    if event.key == pygame.K_q: 
       sys.exit()
+    elif event.key == pygame.K_LEFT:
+      self.tetromino.move_left()
+    elif event.key == pygame.K_RIGHT:
+      self.tetromino.move_right()
+    elif event.key == pygame.K_SPACE:
+      self.tetromino.move_all_way_down()
   
   def _upgrade_screen(self):
     '''Draws items on screen on every iteration of the game loop'''

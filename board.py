@@ -7,6 +7,11 @@ class Board:
     self.settings = tet_game.settings
     self.grid = [[None for j in range(self.settings.grid_columns)] for i in range(self.settings.grid_rows)] # access: first row, then column
     
+    self.border_left = self.settings.board_margin_x
+    self.border_right = self.settings.board_margin_x + self.settings.grid_columns * self.settings.square_width
+    self.border_top = self.settings.board_margin_y
+    self.border_bottom = self.settings.board_margin_y + self.settings.grid_rows * self.settings.square_height
+    
   def draw(self):
     '''Draw board on screen'''
     # iterate: first down, then right
@@ -21,7 +26,7 @@ class Board:
         self.draw_square_border(pos_x, pos_y)
         
   def fill_square(self, pos_x, pos_y, color):
-    '''Fills square with color'''
+    '''Visually fills square with color'''
     rect = pygame.Rect(0, 0, self.settings.square_width, self.settings.square_height)
     rect.x, rect.y = pos_x, pos_y
     pygame.draw.rect(self.screen, color, rect)
@@ -31,3 +36,9 @@ class Board:
     frame = pygame.Rect(0, 0, self.settings.square_width, self.settings.square_height)
     frame.x, frame.y = pos_x, pos_y
     pygame.draw.rect(self.screen, self.settings.board_frame_color, frame, width=1)
+    
+  def get_square_place(self, pos_x, pos_y):
+    '''Returns place of square on the board as a (i, j) position'''
+    j = int((pos_x - self.settings.board_margin_x) / self.settings.square_width)
+    i = int((pos_y - self.settings.board_margin_y) / self.settings.square_height)
+    return i, j

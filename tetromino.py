@@ -18,6 +18,8 @@ class Tetromino:
       self.shape = self._shape_rotate(self.shape)
       
     self.squares = pygame.sprite.Group()
+    
+    self.collided_down = False
       
     self._place_tet()
     self._prep_tet()
@@ -47,15 +49,67 @@ class Tetromino:
       square.draw()
     
   def move_down(self):
-    '''Moves tetromino down'''
+    '''Moves tetromino down''' 
+    if self._check_down_collision():
+      self.collided_down = True
+      return
+       
     for square in self.squares:
       square.rect.y += self.settings.square_height
       square.border.y += self.settings.square_height
   
   def move_left(self):
     '''Moves tetromino left'''
-    pass
+    if self._check_left_collision() or self.collided_down:
+      return
+    
+    for square in self.squares:
+      square.rect.x -= self.settings.square_height
+      square.border.x -= self.settings.square_height
   
   def move_right(self):
     '''Moves tetromino right'''
-    pass  
+    if self._check_right_collision() or self.collided_down:
+      return
+    
+    for square in self.squares:
+      square.rect.x += self.settings.square_height
+      square.border.x += self.settings.square_height 
+      
+  def _check_down_collision(self):
+    '''Check if there is a collision of at least one square with bottom border or square below
+    If True returned, then there is a collision'''
+    for square in self.squares:
+      square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
+      if square_i == self.settings.grid_rows-1 \
+          or self.board.grid[square_i+1][square_j] != None:
+        return True
+      
+    return False    
+  
+  def _check_left_collision(self):
+    '''Check if there is a collision of at least one square with left border or square
+    If True returned, then there is a collision'''
+    for square in self.squares:
+      square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
+      if square_j == 0 \
+          or self.board.grid[square_i][square_j-1] != None:
+        return True
+      
+    return False    
+  
+  def _check_right_collision(self):
+    '''Check if there is a collision of at least one square with right border or square
+    If True returned, then there is a collision'''
+    for square in self.squares:
+      square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
+      if square_j == self.settings.grid_columns-1 \
+          or self.board.grid[square_i][square_j+1] != None:
+        return True
+      
+    return False   
+      
+  def move_all_way_down(self):
+    '''Moves tetromino down up to a point where there is a collision'''
+    while not self.collided_down:
+      self.move_down()
