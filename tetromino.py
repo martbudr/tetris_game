@@ -11,7 +11,7 @@ class Tetromino:
     self.settings = tet_game.settings
     self.board = tet_game.board
     
-    self.color = self.settings.tile_colors[str(randint(1, self.settings.tile_colors_amt))]
+    self.color_id = str(randint(1, self.settings.tile_colors_amt))
     self.shape = self.settings.tile_shapes[randint(0, self.settings.tile_shapes_amt-1)]
     rotation = randint(0, 3)
     for i in range(rotation):
@@ -38,10 +38,10 @@ class Tetromino:
     for i in range(len(self.shape)):
       for j in range(len(self.shape[0])):
         if self.shape[i][j] == 1:
-          square = Square(self.tet_game, self.color, 
+          square = Square(self.tet_game, self.settings.tile_colors[self.color_id], 
                          self.pos_x + j * self.settings.square_width, 
                          self.pos_y + i * self.settings.square_height)
-          self.squares.add(square)  
+          self.squares.add(square) 
     
   def draw(self):
     '''Draw tetromino on screen'''
@@ -82,7 +82,7 @@ class Tetromino:
     for square in self.squares:
       square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
       if square_i == self.settings.grid_rows-1 \
-          or self.board.grid[square_i+1][square_j] != None:
+          or (square_i >= -1 and self.board.grid[square_i+1][square_j] != None):
         return True
       
     return False    
@@ -93,7 +93,7 @@ class Tetromino:
     for square in self.squares:
       square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
       if square_j == 0 \
-          or self.board.grid[square_i][square_j-1] != None:
+          or (square_i >= 0 and self.board.grid[square_i][square_j-1] != None):
         return True
       
     return False    
@@ -104,7 +104,7 @@ class Tetromino:
     for square in self.squares:
       square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
       if square_j == self.settings.grid_columns-1 \
-          or self.board.grid[square_i][square_j+1] != None:
+          or (square_i >= 0 and self.board.grid[square_i][square_j+1] != None):
         return True
       
     return False   

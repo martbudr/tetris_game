@@ -1,6 +1,5 @@
 import pygame
 import sys
-from time import sleep
 
 from settings import Settings
 from board import Board
@@ -33,6 +32,10 @@ class Tetris:
       if time_elapsed_since_last_movedown > 3000 and not self.tetromino.collided_down:
         self.tetromino.move_down()
         time_elapsed_since_last_movedown = 0
+        
+      if self.tetromino.collided_down:
+        self.board.place_tetromino(self.tetromino)
+        self.tile_falling = False
       
       self._upgrade_screen()
       
