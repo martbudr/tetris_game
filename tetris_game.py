@@ -40,7 +40,8 @@ class Tetris:
             self._game_over()
           else:
             self.board.place_tetromino(self.tetromino)
-            self.board.check_rows(self.tetromino)
+            self.board.remove_full_rows(self.tetromino)
+            
             self.tile_falling = False
       
       self._upgrade_screen()
