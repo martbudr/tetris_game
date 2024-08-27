@@ -5,9 +5,9 @@ class Settings:
     self.bg_color = (255, 204, 211)
     
     # Board settings
-    self.grid_rows, self.grid_columns = 30, 20
-    self.board_margin_x, self.board_margin_y = 300, 100
-    self.square_width = self.square_height = 20
+    self.grid_rows, self.grid_columns = 22, 14
+    self.board_margin_x, self.board_margin_y = 300, 150
+    self.square_width = self.square_height = 26
     self.board_frame_color = (255, 255, 255)
     
     # Tetromino settings

@@ -1,5 +1,7 @@
 import pygame
 
+from square import Square
+
 class Board:
   def __init__(self, tet_game):
     '''Init the board'''
@@ -17,7 +19,7 @@ class Board:
     # iterate: first down, then right
     for i in range(self.settings.grid_rows):
       for j in range(self.settings.grid_columns):
-        pos_x, pos_y = self._get_square_pos(i, j)
+        pos_x, pos_y = self.get_square_pos(i, j)
         
         if self.grid[i][j] != None:
           self.fill_square(pos_x, pos_y, self.settings.tile_colors[self.grid[i][j]])
@@ -36,7 +38,7 @@ class Board:
     frame.x, frame.y = pos_x, pos_y
     pygame.draw.rect(self.screen, self.settings.board_frame_color, frame, width=1)
     
-  def _get_square_pos(self, i, j):
+  def get_square_pos(self, i, j):
     '''Returns position of a square on the screen as a (pos_x, pos_y)'''  
     pos_x = self.settings.board_margin_x + j * self.settings.square_width
     pos_y = self.settings.board_margin_y + i * self.settings.square_height
@@ -52,4 +54,9 @@ class Board:
     '''Places tetromino on the board'''
     for square in tetromino.squares:
       square_i, square_j = self.get_square_place(square.rect.x, square.rect.y)
-      self.grid[square_i][square_j] = tetromino.color_id
+      self.grid[square_i][square_j] = square.color_id
+      
+  
+  def check_rows(self, tetromino):
+    '''Checks for full rows (where the new tetromino fell)'''
+    

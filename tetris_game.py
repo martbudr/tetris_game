@@ -16,6 +16,7 @@ class Tetris:
     
     self.board = Board(self)
     
+    self.game_running = True
     self.tile_falling = False # a variable to check if there is a generated tetromino falling at the moment (so that if there isn't, a new one can be generated)
   
   def run_game(self):
@@ -25,22 +26,39 @@ class Tetris:
     while True:
       self._check_events()
       
-      if not self.tile_falling:
-        self.tetromino = Tetromino(self)
-        self.tile_falling = True
-      
-      if time_elapsed_since_last_movedown > 3000 and not self.tetromino.collided_down:
-        self.tetromino.move_down()
-        time_elapsed_since_last_movedown = 0
+      if self.game_running:
+        if not self.tile_falling:
+          self.tetromino = Tetromino(self)
+          self.tile_falling = True
         
-      if self.tetromino.collided_down:
-        self.board.place_tetromino(self.tetromino)
-        self.tile_falling = False
+        if time_elapsed_since_last_movedown > 3000 and not self.tetromino.collided_down:
+          self.tetromino.move_down()
+          time_elapsed_since_last_movedown = 0
+          
+        if self.tetromino.collided_down:
+          if not self._check_place_possible():
+            self._game_over()
+          else:
+            self.board.place_tetromino(self.tetromino)
+            self.board.check_rows(self.tetromino)
+            self.tile_falling = False
       
       self._upgrade_screen()
       
       self.clock.tick(FPS)
       time_elapsed_since_last_movedown += FPS
+  
+  def _check_place_possible(self):
+    '''Checks if it is possible to place tetromino in its current place'''
+    for square in self.tetromino.squares:
+      square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
+      if square_i < 0:
+        return False
+    return True
+  
+  def _game_over(self):
+    '''Reaction on game end'''
+    self.game_running = False
   
   def _check_events(self):
     '''Checks for user input'''
@@ -58,6 +76,8 @@ class Tetris:
       self.tetromino.move_left()
     elif event.key == pygame.K_RIGHT:
       self.tetromino.move_right()
+    elif event.key == pygame.K_UP:
+      self.tetromino.shape_rotate()
     elif event.key == pygame.K_SPACE:
       self.tetromino.move_all_way_down()
   

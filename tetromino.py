@@ -11,22 +11,26 @@ class Tetromino:
     self.settings = tet_game.settings
     self.board = tet_game.board
     
+    self.squares = pygame.sprite.Group()
+    
     self.color_id = str(randint(1, self.settings.tile_colors_amt))
     self.shape = self.settings.tile_shapes[randint(0, self.settings.tile_shapes_amt-1)]
     rotation = randint(0, 3)
     for i in range(rotation):
-      self.shape = self._shape_rotate(self.shape)
-      
-    self.squares = pygame.sprite.Group()
+      self.shape_rotate()
     
     self.collided_down = False
       
     self._place_tet()
     self._prep_tet()
     
-  def _shape_rotate(self, shape):
+  def shape_rotate(self):
     '''Rotates shape by 90 degrees'''
-    return [list(row)[::-1] for row in zip(*shape)]  
+    self.shape = [list(row)[::-1] for row in zip(*self.shape)]  
+    
+    if len(self.squares):
+      self.squares.empty()
+      self._prep_tet()
     
   def _place_tet(self):
     '''Places tetromino right above the board'''
@@ -38,7 +42,7 @@ class Tetromino:
     for i in range(len(self.shape)):
       for j in range(len(self.shape[0])):
         if self.shape[i][j] == 1:
-          square = Square(self.tet_game, self.settings.tile_colors[self.color_id], 
+          square = Square(self.tet_game, self.color_id, 
                          self.pos_x + j * self.settings.square_width, 
                          self.pos_y + i * self.settings.square_height)
           self.squares.add(square) 
@@ -54,27 +58,35 @@ class Tetromino:
       self.collided_down = True
       return
        
+    self.pos_y += self.settings.square_height
     for square in self.squares:
       square.rect.y += self.settings.square_height
       square.border.y += self.settings.square_height
+      
+  def move_all_way_down(self):
+    '''Moves tetromino down up to a point where there is a collision'''
+    while not self.collided_down:
+      self.move_down()
   
   def move_left(self):
     '''Moves tetromino left'''
     if self._check_left_collision() or self.collided_down:
       return
     
+    self.pos_x -= self.settings.square_width
     for square in self.squares:
-      square.rect.x -= self.settings.square_height
-      square.border.x -= self.settings.square_height
+      square.rect.x -= self.settings.square_width
+      square.border.x -= self.settings.square_width
   
   def move_right(self):
     '''Moves tetromino right'''
     if self._check_right_collision() or self.collided_down:
       return
     
+    self.pos_x += self.settings.square_width
     for square in self.squares:
-      square.rect.x += self.settings.square_height
-      square.border.x += self.settings.square_height 
+      square.rect.x += self.settings.square_width
+      square.border.x += self.settings.square_width
       
   def _check_down_collision(self):
     '''Check if there is a collision of at least one square with bottom border or square below
@@ -107,9 +119,4 @@ class Tetromino:
           or (square_i >= 0 and self.board.grid[square_i][square_j+1] != None):
         return True
       
-    return False   
-      
-  def move_all_way_down(self):
-    '''Moves tetromino down up to a point where there is a collision'''
-    while not self.collided_down:
-      self.move_down()
+    return False 
