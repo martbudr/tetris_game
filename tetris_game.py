@@ -4,6 +4,8 @@ import sys
 from settings import Settings
 from board import Board
 from tetromino import Tetromino
+from game_stats import GameStats
+from scoreboard import Scoreboard
 
 class Tetris:
   def __init__(self):
@@ -14,6 +16,8 @@ class Tetris:
     self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
     pygame.display.set_caption("Tetris Game")
     
+    self.stats = GameStats()
+    self.sb = Scoreboard(self)
     self.board = Board(self)
     
     self.game_running = True
@@ -85,7 +89,8 @@ class Tetris:
   def _upgrade_screen(self):
     '''Draws items on screen on every iteration of the game loop'''
     self.screen.fill(self.settings.bg_color)
-    
+    self.sb.show_score()
+        
     self.board.draw()
     self.tetromino.draw()
     

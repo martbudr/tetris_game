@@ -10,6 +10,9 @@ class Settings:
     self.square_width = self.square_height = 26
     self.board_frame_color = (255, 255, 255)
     
+    # Score settings
+    self.square_score = 20
+    
     # Tetromino settings
     self.tile_colors = {
       '1': (10, 10, 10),

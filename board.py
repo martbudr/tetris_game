@@ -7,6 +7,8 @@ class Board:
     '''Init the board'''
     self.screen = tet_game.screen
     self.settings = tet_game.settings
+    self.stats = tet_game.stats
+    self.sb = tet_game.sb
     self.grid = [[None for j in range(self.settings.grid_columns)] for i in range(self.settings.grid_rows)] # access: first row, then column
     
     self.border_left = self.settings.board_margin_x
@@ -61,6 +63,8 @@ class Board:
     full_row_numbers = self._get_full_rows(tetromino)
     for row_num in full_row_numbers:
       self._delete_row(row_num)
+      self.stats.score += self.settings.grid_columns * self.settings.square_score
+    self.sb.prep_score()
     
   def _get_full_rows(self, tetromino):
     '''Returns full rows (checks only those where the new tetromino fell)'''
