@@ -83,6 +83,7 @@ class Tetris:
       self.tetromino.move_right()
     elif event.key == pygame.K_UP:
       self.tetromino.shape_rotate()
+      self.tetromino.move_into_board()
     elif event.key == pygame.K_SPACE:
       self.tetromino.move_all_way_down()
   

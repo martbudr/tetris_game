@@ -31,6 +31,23 @@ class Tetromino:
     if len(self.squares):
       self.squares.empty()
       self._prep_tet()
+      
+  def move_into_board(self):
+    '''Moves the tetromino inside the board if it has fallen outside'''
+    max_out = 0
+    for square in self.squares:
+      square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
+      if square_j < 0:
+        max_out = min(max_out, square_j)
+      elif square_j >= self.settings.grid_columns:
+        max_out = max(max_out, square_j-self.settings.grid_columns+1)   
+        
+    while max_out < 0:
+      self._move_squares_right()
+      max_out += 1
+    while max_out > 0:
+      self._move_squares_left()
+      max_out -= 1
     
   def _place_tet(self):
     '''Places tetromino right above the board'''
@@ -73,6 +90,10 @@ class Tetromino:
     if self._check_left_collision() or self.collided_down:
       return
     
+    self._move_squares_left()
+  
+  def _move_squares_left(self):
+    '''Function to move all squares left'''
     self.pos_x -= self.settings.square_width
     for square in self.squares:
       square.rect.x -= self.settings.square_width
@@ -83,10 +104,14 @@ class Tetromino:
     if self._check_right_collision() or self.collided_down:
       return
     
+    self._move_squares_right()
+    
+  def _move_squares_right(self):
+    '''Function to move all squares right'''
     self.pos_x += self.settings.square_width
     for square in self.squares:
       square.rect.x += self.settings.square_width
-      square.border.x += self.settings.square_width
+      square.border.x += self.settings.square_width    
       
   def _check_down_collision(self):
     '''Check if there is a collision of at least one square with bottom border or square below
