@@ -35,23 +35,31 @@ class Tetris:
           self.tetromino = Tetromino(self)
           self.tile_falling = True
         
-        if time_elapsed_since_last_movedown > 3000 and not self.tetromino.collided_down:
-          self.tetromino.move_down()
-          time_elapsed_since_last_movedown = 0
+        self._move_tetromino_down()
           
         if self.tetromino.collided_down:
-          if not self._check_place_possible():
-            self._game_over()
-          else:
-            self.board.place_tetromino(self.tetromino)
-            self._remove_full_rows()
-            
-            self.tile_falling = False
+          self._handle_tetromino_down()
       
       self._upgrade_screen()
       
       self.clock.tick(FPS)
       time_elapsed_since_last_movedown += FPS
+  
+  def _move_tetromino_down(self):
+    '''Moves tetromino down if sufficient time has passed'''
+    if time_elapsed_since_last_movedown > 3000 and not self.tetromino.collided_down:
+      self.tetromino.move_down()
+      time_elapsed_since_last_movedown = 0
+  
+  def _handle_tetromino_down(self):
+    '''Reaction when the tetromino hits something (bottom border or another tetromino)'''
+    if not self._check_place_possible():
+      self._game_over()
+    else:
+      self.board.place_tetromino(self.tetromino)
+      self._remove_full_rows()
+      
+      self.tile_falling = False
   
   def _check_place_possible(self):
     '''Checks if it is possible to place tetromino in its current place'''
