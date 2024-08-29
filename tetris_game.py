@@ -44,7 +44,7 @@ class Tetris:
             self._game_over()
           else:
             self.board.place_tetromino(self.tetromino)
-            self.board.remove_full_rows(self.tetromino)
+            self._remove_full_rows()
             
             self.tile_falling = False
       
@@ -58,6 +58,31 @@ class Tetris:
     for square in self.tetromino.squares:
       square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
       if square_i < 0:
+        return False
+    return True
+  
+  def _remove_full_rows(self):
+    '''Removes full rows from the board'''
+    full_row_numbers = self._get_full_rows()
+    for row_num in full_row_numbers:
+      self.board.delete_row(row_num)
+      self.stats.score += self.settings.grid_columns * self.settings.square_score
+    self.sb.prep_score()
+    self.sb.check_high_score()
+    
+  def _get_full_rows(self):
+    '''Returns full rows (checks only those where the new tetromino fell)'''
+    row_numbers = set()
+    for square in self.tetromino.squares:
+      square_i, square_j = self.board.get_square_place(square.rect.x, square.rect.y)
+      if square_i not in row_numbers and self._check_one_row(square_i):
+        row_numbers.add(square_i)
+    return row_numbers
+  
+  def _check_one_row(self, row_number):
+    '''Checks one row - if it is full or not'''
+    for j in range(self.settings.grid_columns):
+      if self.board.grid[row_number][j] == None:
         return False
     return True
   
@@ -76,6 +101,7 @@ class Tetris:
   def _check_keydown_events(self, event):
     '''Checks keydown events and triggers appropriate responses'''
     if event.key == pygame.K_q: 
+      self.stats.save_high_score()
       sys.exit()
     elif event.key == pygame.K_LEFT:
       self.tetromino.move_left()
@@ -90,7 +116,7 @@ class Tetris:
   def _upgrade_screen(self):
     '''Draws items on screen on every iteration of the game loop'''
     self.screen.fill(self.settings.bg_color)
-    self.sb.show_score()
+    self.sb.show_scores()
         
     self.board.draw()
     self.tetromino.draw()

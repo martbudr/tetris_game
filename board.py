@@ -57,32 +57,8 @@ class Board:
     for square in tetromino.squares:
       square_i, square_j = self.get_square_place(square.rect.x, square.rect.y)
       self.grid[square_i][square_j] = square.color_id
-      
-  def remove_full_rows(self, tetromino):
-    '''Removes full rows from the board'''
-    full_row_numbers = self._get_full_rows(tetromino)
-    for row_num in full_row_numbers:
-      self._delete_row(row_num)
-      self.stats.score += self.settings.grid_columns * self.settings.square_score
-    self.sb.prep_score()
-    
-  def _get_full_rows(self, tetromino):
-    '''Returns full rows (checks only those where the new tetromino fell)'''
-    row_numbers = set()
-    for square in tetromino.squares:
-      square_i, square_j = self.get_square_place(square.rect.x, square.rect.y)
-      if square_i not in row_numbers and self._check_one_row(square_i):
-        row_numbers.add(square_i)
-    return row_numbers
-    
-  def _check_one_row(self, row_number):
-    '''Checks one row - if it is full or not'''
-    for j in range(self.settings.grid_columns):
-      if self.grid[row_number][j] == None:
-        return False
-    return True
   
-  def _delete_row(self, row_number):
+  def delete_row(self, row_number):
     '''Deletes full row'''
     for i in range(row_number, 1, -1):
       for j in range(self.settings.grid_columns):
