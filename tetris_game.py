@@ -25,7 +25,7 @@ class Tetris:
   
   def run_game(self):
     '''Game loop'''
-    time_elapsed_since_last_movedown = 0
+    self.time_elapsed_since_last_movedown = 0
     FPS = 60
     while True:
       self._check_events()
@@ -43,13 +43,13 @@ class Tetris:
       self._upgrade_screen()
       
       self.clock.tick(FPS)
-      time_elapsed_since_last_movedown += FPS
+      self.time_elapsed_since_last_movedown += FPS
   
   def _move_tetromino_down(self):
     '''Moves tetromino down if sufficient time has passed'''
-    if time_elapsed_since_last_movedown > 3000 and not self.tetromino.collided_down:
+    if self.time_elapsed_since_last_movedown > 3000 and not self.tetromino.collided_down:
       self.tetromino.move_down()
-      time_elapsed_since_last_movedown = 0
+      self.time_elapsed_since_last_movedown = 0
   
   def _handle_tetromino_down(self):
     '''Reaction when the tetromino hits something (bottom border or another tetromino)'''
@@ -124,10 +124,14 @@ class Tetris:
   def _upgrade_screen(self):
     '''Draws items on screen on every iteration of the game loop'''
     self.screen.fill(self.settings.bg_color)
-    self.sb.show_scores()
         
-    self.board.draw()
-    self.tetromino.draw()
+    if not self.game_running:
+      pass
+    elif self.game_running:
+      self.sb.show_scores()
+      
+      self.board.draw()
+      self.tetromino.draw()
     
     pygame.display.flip()
   
