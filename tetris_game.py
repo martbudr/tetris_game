@@ -1,49 +1,83 @@
 import pygame
 import sys
 
-from settings import Settings
 from board import Board
 from tetromino import Tetromino
 from game_stats import GameStats
 from scoreboard import Scoreboard
 
 class Tetris:
-  def __init__(self):
+  def __init__(self, game_run):
     '''Initialisation of the game'''
-    pygame.init()
-    self.clock = pygame.time.Clock()
-    self.settings = Settings()
-    self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
-    pygame.display.set_caption("Tetris Game")
+    self.game_run = game_run
+    self.settings = game_run.settings
+    self.screen = game_run.screen
     
     self.stats = GameStats()
     self.sb = Scoreboard(self)
     self.board = Board(self)
     
-    self.game_running = True
+    self.time_elapsed_since_last_movedown = 0
+    
+    self.game_not_over = True
     self.tile_falling = False # a variable to check if there is a generated tetromino falling at the moment (so that if there isn't, a new one can be generated)
   
   def run_game(self):
-    '''Game loop'''
-    self.time_elapsed_since_last_movedown = 0
-    FPS = 60
-    while True:
-      self._check_events()
+    '''Single instance of game loop'''
+    self._check_events()
+    
+    if self.game_run.game_running:
+      if not self.tile_falling:
+        self.tetromino = Tetromino(self)
+        self.tile_falling = True
       
-      if self.game_running:
-        if not self.tile_falling:
-          self.tetromino = Tetromino(self)
-          self.tile_falling = True
+      self._move_tetromino_down()
         
-        self._move_tetromino_down()
-          
-        if self.tetromino.collided_down:
-          self._handle_tetromino_down()
+      if self.tetromino.collided_down:
+        self._handle_tetromino_down()
       
-      self._upgrade_screen()
+    self._upgrade_screen()
+    
+    self.time_elapsed_since_last_movedown += self.game_run.FPS
+    
+  def show_window(self):
+    '''Show window (outside this class)'''
+    self._upgrade_screen()
+    
+  def _check_events(self):
+    '''Checks for user input'''
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        self.trigger_game_over()
+        sys.exit()
+      elif event.type == pygame.KEYDOWN:
+        self._check_keydown_events(event)
+        
+  def _check_keydown_events(self, event):
+    '''Checks keydown events and triggers appropriate responses'''
+    if event.key == pygame.K_q: 
+      self._pause_game()
+    elif self.game_run.game_running:
+      if event.key == pygame.K_LEFT:
+        self.tetromino.move_left()
+      elif event.key == pygame.K_RIGHT:
+        self.tetromino.move_right()
+      elif event.key == pygame.K_UP:
+        self.tetromino.shape_rotate()
+        self.tetromino.move_into_board()
+      elif event.key == pygame.K_SPACE:
+        self.tetromino.move_all_way_down()
+    
+  def _pause_game(self):
+    '''Puts the game on hold'''
+    self.game_run.game_running = False
+    self.game_run.game_quit = True  
       
-      self.clock.tick(FPS)
-      self.time_elapsed_since_last_movedown += FPS
+  def trigger_game_over(self):
+    '''Reaction on game end'''
+    self.game_run.game_running = False
+    self.game_run.game_over = True
+    self.stats.save_high_score()
   
   def _move_tetromino_down(self):
     '''Moves tetromino down if sufficient time has passed'''
@@ -54,7 +88,7 @@ class Tetris:
   def _handle_tetromino_down(self):
     '''Reaction when the tetromino hits something (bottom border or another tetromino)'''
     if not self._check_place_possible():
-      self._game_over()
+      self.trigger_game_over()
     else:
       self.board.place_tetromino(self.tetromino)
       self._remove_full_rows()
@@ -94,47 +128,9 @@ class Tetris:
         return False
     return True
   
-  def _game_over(self):
-    '''Reaction on game end'''
-    self.game_running = False
-  
-  def _check_events(self):
-    '''Checks for user input'''
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:
-        sys.exit()
-      elif event.type == pygame.KEYDOWN:
-        self._check_keydown_events(event)
-        
-  def _check_keydown_events(self, event):
-    '''Checks keydown events and triggers appropriate responses'''
-    if event.key == pygame.K_q: 
-      self.stats.save_high_score()
-      sys.exit()
-    elif event.key == pygame.K_LEFT:
-      self.tetromino.move_left()
-    elif event.key == pygame.K_RIGHT:
-      self.tetromino.move_right()
-    elif event.key == pygame.K_UP:
-      self.tetromino.shape_rotate()
-      self.tetromino.move_into_board()
-    elif event.key == pygame.K_SPACE:
-      self.tetromino.move_all_way_down()
-  
   def _upgrade_screen(self):
-    '''Draws items on screen on every iteration of the game loop'''
-    self.screen.fill(self.settings.bg_color)
-        
-    if not self.game_running:
-      pass
-    elif self.game_running:
-      self.sb.show_scores()
-      
-      self.board.draw()
-      self.tetromino.draw()
+    '''Draws items on screen on every iteration of the game loop'''        
+    self.sb.show_scores()
     
-    pygame.display.flip()
-  
-if __name__ == "__main__":
-  tetris = Tetris()
-  tetris.run_game()
+    self.board.draw()
+    self.tetromino.draw()

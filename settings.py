@@ -8,6 +8,7 @@ class Settings:
     self.grid_rows, self.grid_columns = 22, 14
     self.board_margin_x, self.board_margin_y = 300, 150
     self.square_width = self.square_height = 26
+    self.text_color = (50, 50, 50)
     self.board_frame_color = (255, 255, 255)
     
     # Score settings
@@ -45,3 +46,7 @@ class Settings:
        [1, 1]]
     ]
     self.tile_shapes_amt = len(self.tile_shapes)
+    
+    self.button_color = (0, 0, 0)
+    self.button_border_color = (255, 255, 255)
+    self.message_bg_color = (30, 30, 30)
