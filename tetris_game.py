@@ -1,25 +1,21 @@
 import pygame
-import sys
 
+from window import Window
 from board import Board
 from tetromino import Tetromino
 from game_stats import GameStats
 from scoreboard import Scoreboard
 
-class Tetris:
+class Tetris(Window):
   def __init__(self, game_run):
     '''Initialisation of the game'''
-    self.game_run = game_run
-    self.settings = game_run.settings
-    self.screen = game_run.screen
-    
+    super().__init__(game_run)    
     self.stats = GameStats()
     self.sb = Scoreboard(self)
     self.board = Board(self)
     
     self.time_elapsed_since_last_movedown = 0
     
-    self.game_not_over = True
     self.tile_falling = False # a variable to check if there is a generated tetromino falling at the moment (so that if there isn't, a new one can be generated)
   
   def run_game(self):
@@ -48,8 +44,7 @@ class Tetris:
     '''Checks for user input'''
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
-        self.trigger_game_over()
-        sys.exit()
+        self.exit_game()
       elif event.type == pygame.KEYDOWN:
         self._check_keydown_events(event)
         

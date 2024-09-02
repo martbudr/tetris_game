@@ -19,12 +19,16 @@ class GameRun:
     self.go = GameOverWindow(self)
     self.quit = QuitWindow(self)
     
+    self.init_running()
+    
+    self.FPS = 60
+    
+  def init_running(self):
+    '''Defines which windows are running'''
     self.game_exists = False
     self.game_over = False
     self.game_quit = False
     self.game_running = False
-    
-    self.FPS = 60
 
   def game_loop(self):
     '''Triggers appropriate windows depending on the state of the game'''

@@ -3,7 +3,7 @@ from os.path import exists
 
 class GameStats:
   def __init__(self):
-    self.reset_stats()
+    self.score = 0
     self._read_high_score()
     
   def _read_high_score(self):
@@ -15,7 +15,3 @@ class GameStats:
   def save_high_score(self):
     '''Zapisuje najlepszy wynik w pliku'''
     self.high_score_path.write_text(str(self.high_score)) 
-    
-  def reset_stats(self):
-    '''Resets stats that are changeable'''
-    self.score = 0 

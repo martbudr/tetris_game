@@ -2,7 +2,7 @@ import pygame
 
 class Button:
   '''Represents a button in game'''
-  def __init__(self, game_run, msg, center=True, pos=(), font_size=24, width=100, height=40):
+  def __init__(self, game_run, msg, centerx=True, centery=True, pos=(0, 0), font_size=24, width=100, height=50):
     self.screen = game_run.screen
     self.settings = game_run.settings
     self.button_color = self.settings.button_color
@@ -13,12 +13,14 @@ class Button:
     self.rect = pygame.Rect(0, 0, self.width, self.height)
     self.border_rect = pygame.Rect(0, 0, self.width, self.height)
     
-    if center == True:
-      self.rect.center = self.screen.get_rect().center
-      self.border_rect.center = self.rect.center
-    else:
-      self.rect.x, self.rect.y = pos
-      self.border_rect.x, self.border_rect.y = pos
+    self.rect.x, self.rect.y = pos
+    self.border_rect.x, self.border_rect.y = pos
+    if centerx == True:
+      self.rect.centerx = self.screen.get_rect().centerx
+      self.border_rect.centerx = self.screen.get_rect().centerx
+    if centery == True:
+      self.rect.centery = self.screen.get_rect().centery
+      self.border_rect.centery = self.screen.get_rect().centery
     
     self._prep_msg(msg)
     

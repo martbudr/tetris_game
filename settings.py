@@ -50,3 +50,4 @@ class Settings:
     self.button_color = (0, 0, 0)
     self.button_border_color = (255, 255, 255)
     self.message_bg_color = (30, 30, 30)
+    self.message_text_color = (255, 255, 255)
